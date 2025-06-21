@@ -72,7 +72,7 @@ OCR_LANGUAGES = ["por", "eng"]
 DEFAULT_OCR_LANGUAGE = "por+eng"
 
 # ============================================================================
-# CONFIGURAÇÕES DE TREINAMENTO
+# CONFIGURAÇÕES DE TREINAMENTO PADRÃO
 # ============================================================================
 DEFAULT_TRAINING_CONFIG = {
     "output_dir": "data/models/lora_output",

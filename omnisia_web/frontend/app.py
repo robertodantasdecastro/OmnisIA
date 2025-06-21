@@ -58,6 +58,7 @@ from config import (
     get_help_texts,
     is_development_mode,
     is_debug_enabled,
+    get_api_url,
 )
 
 from utils import (
@@ -180,8 +181,9 @@ def show_app_info():
         st.sidebar.markdown("### 🔧 Debug")
         st.sidebar.markdown("✅ Modo debug ativado")
         st.sidebar.markdown(f"🌐 API: {get_api_url()}")
+        cache_stats = get_cache_stats()
         st.sidebar.markdown(
-            f"📁 Cache: {'✅' if get_cache_stats()['enabled'] else '❌'}"
+            f"📁 Cache: {'✅' if cache_stats.get('enabled', False) else '❌'}"
         )
 
 
@@ -209,7 +211,7 @@ def cleanup_session():
 
         # Limpa cache se necessário
         cache_stats = get_cache_stats()
-        if cache_stats["size"] > cache_stats["max_size"]:
+        if cache_stats.get("size", 0) > cache_stats.get("max_size", 100):
             clear_cache()
 
     except Exception as e:

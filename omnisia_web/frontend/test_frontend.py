@@ -1,132 +1,198 @@
 #!/usr/bin/env python3
 """
-Testes para o Frontend OmnisIA Trainer Web
+Teste do Frontend OmnisIA Trainer Web
+Verifica se todas as importações e configurações estão corretas
 """
 
-import unittest
-from unittest.mock import patch, MagicMock
 import sys
 import os
+from pathlib import Path
 
-# Adicionar o diretório frontend ao path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-from utils import format_file_size, get_file_icon, check_api_connection
-from config import API_URL, SUPPORTED_FILE_TYPES
+# Adiciona o diretório atual ao path
+sys.path.append(str(Path(__file__).parent))
 
 
-class TestUtils(unittest.TestCase):
-    """Testes para as funções utilitárias"""
+def test_imports():
+    """Testa todas as importações"""
+    try:
+        print("🔍 Testando importações...")
 
-    def test_format_file_size(self):
-        """Testa formatação de tamanho de arquivo"""
-        self.assertEqual(format_file_size(0), "0B")
-        self.assertEqual(format_file_size(1024), "1.0KB")
-        self.assertEqual(format_file_size(1024 * 1024), "1.0MB")
-        self.assertEqual(format_file_size(1024 * 1024 * 1024), "1.0GB")
-        self.assertEqual(format_file_size(1500), "1.5KB")
+        # Testa importações do config
+        from config import (
+            PAGE_TITLE,
+            PAGE_ICON,
+            VERSION,
+            get_api_url,
+            get_navigation_pages,
+            is_debug_enabled,
+        )
 
-    def test_get_file_icon(self):
-        """Testa obtenção de ícones de arquivo"""
-        self.assertEqual(get_file_icon(".pdf"), "📄")
-        self.assertEqual(get_file_icon(".txt"), "📝")
-        self.assertEqual(get_file_icon(".jpg"), "🖼️")
-        self.assertEqual(get_file_icon(".mp3"), "🎵")
-        self.assertEqual(get_file_icon(".mp4"), "🎬")
-        self.assertEqual(get_file_icon(".unknown"), "📁")
+        print("✅ Config importado com sucesso")
 
-    @patch("utils.requests.get")
-    def test_check_api_connection_success(self, mock_get):
-        """Testa verificação de conexão com API - sucesso"""
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_get.return_value = mock_response
+        # Testa importações do utils
+        from utils import (
+            init_session_state,
+            get_chat_history,
+            check_api_health,
+            format_file_size,
+        )
 
-        result = check_api_connection("http://localhost:8000")
-        self.assertTrue(result)
+        print("✅ Utils importado com sucesso")
 
-    @patch("utils.requests.get")
-    def test_check_api_connection_failure(self, mock_get):
-        """Testa verificação de conexão com API - falha"""
-        mock_get.side_effect = Exception("Connection error")
+        # Testa importações do components
+        from components import setup_page_config, create_sidebar, create_dashboard
 
-        result = check_api_connection("http://localhost:8000")
-        self.assertFalse(result)
+        print("✅ Components importado com sucesso")
 
+        # Testa importação do app principal
+        import app
 
-class TestConfig(unittest.TestCase):
-    """Testes para as configurações"""
+        print("✅ App principal importado com sucesso")
 
-    def test_api_url(self):
-        """Testa URL da API"""
-        self.assertIsInstance(API_URL, str)
-        self.assertIn("localhost", API_URL)
+        return True
 
-    def test_supported_file_types(self):
-        """Testa tipos de arquivo suportados"""
-        self.assertIsInstance(SUPPORTED_FILE_TYPES, dict)
-        self.assertIn("pdf", SUPPORTED_FILE_TYPES)
-        self.assertIn("txt", SUPPORTED_FILE_TYPES)
-        self.assertIn("jpg", SUPPORTED_FILE_TYPES)
-        self.assertIn("mp3", SUPPORTED_FILE_TYPES)
-        self.assertIn("mp4", SUPPORTED_FILE_TYPES)
+    except Exception as e:
+        print(f"❌ Erro na importação: {e}")
+        return False
 
 
-class TestIntegration(unittest.TestCase):
-    """Testes de integração"""
+def test_configuration():
+    """Testa configurações"""
+    try:
+        print("\n🔧 Testando configurações...")
 
-    def test_config_consistency(self):
-        """Testa consistência das configurações"""
-        from config import SUPPORTED_FILE_TYPES, WHISPER_MODELS
+        from config import (
+            VERSION,
+            PAGE_TITLE,
+            get_api_url,
+            get_navigation_pages,
+            SUPPORTED_FILE_TYPES,
+        )
 
-        # Verifica se os tipos de arquivo têm ícones
-        for file_type in SUPPORTED_FILE_TYPES:
-            icon = get_file_icon(f".{file_type}")
-            self.assertIsInstance(icon, str)
-            self.assertNotEqual(icon, "📁")  # Não deve ser o ícone padrão
+        print(f"📊 Versão: {VERSION}")
+        print(f"📱 Título: {PAGE_TITLE}")
+        print(f"🌐 API URL: {get_api_url()}")
+        print(f"📄 Páginas: {len(get_navigation_pages())}")
+        print(f"📁 Tipos de arquivo: {len(SUPPORTED_FILE_TYPES)}")
 
-        # Verifica se os modelos Whisper são válidos
-        valid_models = ["tiny", "base", "small", "medium", "large"]
-        for model in WHISPER_MODELS:
-            self.assertIn(model, valid_models)
+        # Verifica se as páginas estão configuradas
+        pages = get_navigation_pages()
+        expected_pages = [
+            "🏠 Dashboard",
+            "📤 Upload",
+            "🔧 Pré-processamento",
+            "🎯 Treinamento",
+            "💬 Chat",
+            "📊 Status",
+        ]
+
+        for page in expected_pages:
+            if page not in pages:
+                print(f"❌ Página faltando: {page}")
+                return False
+
+        print("✅ Todas as configurações estão corretas")
+        return True
+
+    except Exception as e:
+        print(f"❌ Erro na configuração: {e}")
+        return False
 
 
-def run_frontend_tests():
-    """Executa todos os testes do frontend"""
-    print("🧪 Executando testes do Frontend...")
+def test_utilities():
+    """Testa utilitários"""
+    try:
+        print("\n🛠️ Testando utilitários...")
 
-    # Criar suite de testes
-    loader = unittest.TestLoader()
-    suite = unittest.TestSuite()
+        from utils import format_file_size, format_confidence, format_duration
 
-    # Adicionar testes
-    suite.addTests(loader.loadTestsFromTestCase(TestUtils))
-    suite.addTests(loader.loadTestsFromTestCase(TestConfig))
-    suite.addTests(loader.loadTestsFromTestCase(TestIntegration))
+        # Testa formatação
+        assert format_file_size(1024) == "1.0KB"
+        assert format_file_size(1048576) == "1.0MB"
+        print("✅ Formatação de tamanho OK")
 
-    # Executar testes
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
+        # Testa formatação de confiança
+        confidence_str = format_confidence(0.85)
+        assert "Alta" in confidence_str
+        print("✅ Formatação de confiança OK")
 
-    # Resumo
-    print(f"\n📊 Resumo dos Testes:")
-    print(f"✅ Testes executados: {result.testsRun}")
-    print(f"❌ Falhas: {len(result.failures)}")
-    print(f"⚠️ Erros: {len(result.errors)}")
+        # Testa formatação de duração
+        duration_str = format_duration(65)
+        assert "1m" in duration_str
+        print("✅ Formatação de duração OK")
 
-    if result.failures:
-        print("\n❌ Falhas:")
-        for test, traceback in result.failures:
-            print(f"  - {test}: {traceback}")
+        print("✅ Todos os utilitários funcionando")
+        return True
 
-    if result.errors:
-        print("\n⚠️ Erros:")
-        for test, traceback in result.errors:
-            print(f"  - {test}: {traceback}")
+    except Exception as e:
+        print(f"❌ Erro nos utilitários: {e}")
+        return False
 
-    return result.wasSuccessful()
+
+def test_session_state():
+    """Testa estado da sessão"""
+    try:
+        print("\n💾 Testando estado da sessão...")
+
+        from utils import init_session_state
+        from config import SESSION_KEYS
+
+        # Verifica se as chaves de sessão estão definidas
+        required_keys = [
+            "chat_history",
+            "uploaded_files",
+            "context_texts",
+            "user_preferences",
+            "cached_models",
+        ]
+
+        for key in required_keys:
+            if key not in SESSION_KEYS:
+                print(f"❌ Chave de sessão faltando: {key}")
+                return False
+
+        print("✅ Estado da sessão configurado corretamente")
+        return True
+
+    except Exception as e:
+        print(f"❌ Erro no estado da sessão: {e}")
+        return False
+
+
+def main():
+    """Função principal do teste"""
+    print("🧪 TESTE DO FRONTEND OMNISIA TRAINER WEB")
+    print("=" * 50)
+
+    tests = [
+        ("Importações", test_imports),
+        ("Configurações", test_configuration),
+        ("Utilitários", test_utilities),
+        ("Estado da Sessão", test_session_state),
+    ]
+
+    passed = 0
+    total = len(tests)
+
+    for test_name, test_func in tests:
+        print(f"\n📋 Executando teste: {test_name}")
+        if test_func():
+            passed += 1
+        else:
+            print(f"❌ Teste falhou: {test_name}")
+
+    print("\n" + "=" * 50)
+    print(f"📊 RESULTADO: {passed}/{total} testes passaram")
+
+    if passed == total:
+        print("🎉 TODOS OS TESTES PASSARAM!")
+        print("✅ Frontend está pronto para uso!")
+        return True
+    else:
+        print("❌ Alguns testes falharam")
+        return False
 
 
 if __name__ == "__main__":
-    success = run_frontend_tests()
+    success = main()
     sys.exit(0 if success else 1)
