@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+streamlit
+requests
+ocrmypdf
+whisper
+Pillow
+transformers
+sentence-transformers
+faiss-cpu
+peft
+datasets
