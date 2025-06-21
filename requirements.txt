@@ -1,0 +1,12 @@
+ocrmypdf
+whisper
+Pillow
+transformers
+sentence-transformers
+faiss-cpu
+peft
+langchain
+crewai
+langgraph
+fastapi
+uvicorn
