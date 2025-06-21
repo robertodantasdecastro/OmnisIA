@@ -54,3 +54,16 @@ omnisia/
 ├── Dockerfile
 ├── requirements.txt
 └── README.md
+
+## ▶️ Uso rápido
+
+1. Instale as dependências:
+   ```bash
+   ./setup.sh
+   ```
+2. Execute um comando de exemplo:
+   ```bash
+   python main.py ingest-pdf entrada.pdf saida.pdf
+   ```
+
+Mais detalhes em [docs/README.md](docs/README.md).
