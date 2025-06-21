@@ -1,92 +1,100 @@
 # ============================================================================
 # OMNISIA TRAINER WEB - DEPENDÊNCIAS COMPLETAS
 # COMPLETE DEPENDENCIES FOR OMNISIA TRAINER WEB
+# Atualizado em: 2024-12-19
 # ============================================================================
 
 # ============================================================================
 # CORE FRAMEWORK / FRAMEWORK PRINCIPAL
 # ============================================================================
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-streamlit==1.28.2
-pydantic==2.5.0
+fastapi==0.108.0
+uvicorn[standard]==0.25.0
+streamlit==1.29.0
+pydantic==2.5.2
 python-multipart==0.0.6
+starlette==0.32.0
 
 # ============================================================================
 # MACHINE LEARNING / APRENDIZADO DE MÁQUINA
 # ============================================================================
-torch>=2.0.0
-transformers>=4.35.0
-datasets>=2.14.0
-accelerate>=0.24.0
-peft>=0.6.0
-bitsandbytes>=0.41.0
-optimum>=1.14.0
+# PyTorch ecosystem
+torch>=2.1.0
+torchvision>=0.16.0
+torchaudio>=2.1.0
+transformers>=4.36.0
+datasets>=2.15.0
+accelerate>=0.25.0
+tokenizers>=0.15.0
 
-# LoRA e Fine-tuning
-lora>=0.1.0
-adapters>=3.2.0
-deepspeed>=0.12.0
+# Fine-tuning e LoRA
+peft>=0.7.0
+bitsandbytes>=0.41.3
+optimum>=1.16.0
+adapters>=3.2.1
+deepspeed>=0.12.6
 fairscale>=0.4.13
 
-# Modelos locais
+# Embeddings e busca vetorial
 sentence-transformers>=2.2.2
-huggingface-hub>=0.19.0
-tokenizers>=0.15.0
+faiss-cpu>=1.7.4
+huggingface-hub>=0.20.0
 
 # ============================================================================
 # APIS EXTERNAS / EXTERNAL APIS
 # ============================================================================
-openai>=1.3.0
-anthropic>=0.7.0
-google-generativeai>=0.3.0
-cohere>=4.37.0
+openai>=1.6.0
+anthropic>=0.8.0
+google-generativeai>=0.3.2
+cohere>=4.39.0
 
 # AWS
-boto3>=1.34.0
-botocore>=1.34.0
+boto3>=1.34.34
+botocore>=1.34.34
 
 # Azure
 azure-cognitiveservices-language-textanalytics>=5.3.0
 azure-ai-textanalytics>=5.3.0
+azure-storage-blob>=12.19.0
+
+# Google Cloud
+google-cloud-storage>=2.10.0
 
 # ============================================================================
 # BANCO DE DADOS / DATABASES
 # ============================================================================
 # SQL
-sqlalchemy>=2.0.23
-alembic>=1.13.0
+sqlalchemy>=2.0.25
+alembic>=1.13.1
 asyncpg>=0.29.0  # PostgreSQL async
 psycopg2-binary>=2.9.9  # PostgreSQL sync
 aiosqlite>=0.19.0  # SQLite async
 
 # NoSQL
-pymongo>=4.6.0
-motor>=3.3.0  # MongoDB async
+pymongo>=4.6.1
+motor>=3.3.2  # MongoDB async
 redis>=5.0.1
 aioredis>=2.0.1
 
 # Vector databases
-chromadb>=0.4.18
+chromadb>=0.4.22
 pinecone-client>=2.2.4
-weaviate-client>=3.25.0
-qdrant-client>=1.7.0
-faiss-cpu>=1.7.4
+weaviate-client>=3.26.0
+qdrant-client>=1.7.3
 
 # ============================================================================
 # PROCESSAMENTO DE ARQUIVOS / FILE PROCESSING
 # ============================================================================
 # PDF
 PyPDF2>=3.0.1
-pdfplumber>=0.10.0
-pymupdf>=1.23.0
-ocrmypdf>=15.4.0
+pdfplumber>=0.10.3
+pymupdf>=1.23.14  # fitz
+ocrmypdf>=15.4.4
+pdf2image>=1.17.0
 
 # Imagens
-Pillow>=10.1.0
-opencv-python>=4.8.1.78
+Pillow>=10.2.0
+opencv-python>=4.9.0.80
 pytesseract>=0.3.10
-pdf2image>=1.16.3
 
 # Áudio/Vídeo
 openai-whisper>=20231117
@@ -110,29 +118,27 @@ pysftp>=0.2.9
 
 # HTTP/WebDAV
 aiohttp>=3.9.1
-httpx>=0.25.2
+httpx>=0.26.0
 webdavclient3>=3.14.6
 requests>=2.31.0
 
 # Cloud Storage
-google-cloud-storage>=2.10.0
-azure-storage-blob>=12.19.0
 dropbox>=11.36.2
 
 # ============================================================================
 # JUPYTER E NOTEBOOKS / JUPYTER AND NOTEBOOKS
 # ============================================================================
 jupyter>=1.0.0
-jupyterlab>=4.0.9
+jupyterlab>=4.0.10
 notebook>=7.0.6
-ipykernel>=6.27.1
+ipykernel>=6.28.0
 ipywidgets>=8.1.1
-nbconvert>=7.12.0
+nbconvert>=7.14.0
 
 # Jupyter extensions
 jupyterlab-git>=0.50.0
-jupyterlab-lsp>=5.0.0
-jupyter-ai>=2.8.0
+jupyterlab-lsp>=5.0.2
+jupyter-ai>=2.10.0
 
 # ============================================================================
 # VISUALIZAÇÃO / VISUALIZATION
@@ -140,9 +146,9 @@ jupyter-ai>=2.8.0
 matplotlib>=3.8.2
 seaborn>=0.13.0
 plotly>=5.17.0
-bokeh>=3.3.2
+bokeh>=3.3.4
 altair>=5.2.0
-dash>=2.15.0
+dash>=2.16.0
 
 # Streamlit components
 streamlit-plotly>=0.0.1
@@ -154,7 +160,7 @@ streamlit-authenticator>=0.2.3
 # ANÁLISE DE DADOS / DATA ANALYSIS
 # ============================================================================
 pandas>=2.1.4
-numpy>=1.24.4
+numpy>=1.26.2
 scipy>=1.11.4
 scikit-learn>=1.3.2
 statsmodels>=0.14.1
@@ -171,7 +177,7 @@ langdetect>=1.0.9
 prometheus-client>=0.19.0
 grafana-api>=1.0.3
 wandb>=0.16.1
-mlflow>=2.8.1
+mlflow>=2.9.0
 tensorboard>=2.15.1
 
 # Logs
@@ -185,14 +191,12 @@ python-json-logger>=2.0.7
 cryptography>=41.0.8
 passlib[bcrypt]>=1.7.4
 python-jose[cryptography]>=3.3.0
-python-multipart>=0.0.6
 bcrypt>=4.1.2
 
 # ============================================================================
 # UTILITÁRIOS / UTILITIES
 # ============================================================================
 # Async
-asyncio>=3.4.3
 aiofiles>=23.2.1
 anyio>=4.2.0
 
@@ -215,19 +219,18 @@ marshmallow>=3.20.2
 # ============================================================================
 # TESTES / TESTING
 # ============================================================================
-pytest>=7.4.3
+pytest>=7.4.4
 pytest-asyncio>=0.23.2
 pytest-cov>=4.1.0
-httpx>=0.25.2  # Para testes de API
 factory-boy>=3.3.0
 
 # ============================================================================
 # DESENVOLVIMENTO / DEVELOPMENT
 # ============================================================================
 # Code quality
-black>=23.12.0
+black>=23.12.1
 isort>=5.13.2
-flake8>=6.1.0
+flake8>=7.0.0
 mypy>=1.8.0
 pre-commit>=3.6.0
 
@@ -239,25 +242,18 @@ pdb-attach>=3.2.0
 # DEPLOY E PRODUÇÃO / DEPLOY AND PRODUCTION
 # ============================================================================
 gunicorn>=21.2.0
-docker>=6.1.3
-docker-compose>=1.29.2
-
-# Proxy reverso
-nginx>=1.25.3
+docker>=7.0.0
 
 # Process management
 supervisor>=4.2.5
-systemd-python>=235
 
 # ============================================================================
-# KAGGLE INTEGRATION
+# INTEGRAÇÃO EXTERNA / EXTERNAL INTEGRATION
 # ============================================================================
 kaggle>=1.5.16
 opendatasets>=0.1.22
 
-# ============================================================================
-# SAGEMAKER INTEGRATION
-# ============================================================================
+# Sagemaker
 sagemaker>=2.199.0
 sagemaker-training>=4.6.0
 sagemaker-inference>=1.7.0
@@ -266,7 +262,7 @@ sagemaker-inference>=1.7.0
 # EXPERIMENTAL / EXPERIMENTAL
 # ============================================================================
 # Modelos experimentais
-diffusers>=0.24.0
+diffusers>=0.25.0
 controlnet-aux>=0.0.7
 xformers>=0.0.23
 
@@ -277,7 +273,6 @@ h2o>=3.44.0.3
 # Edge computing
 onnx>=1.15.0
 onnxruntime>=1.16.3
-tensorrt>=8.6.1
 
 # ============================================================================
 # VERSÕES ESPECÍFICAS PARA COMPATIBILIDADE
@@ -285,12 +280,41 @@ tensorrt>=8.6.1
 # ============================================================================
 # Evitar conflitos
 protobuf>=3.20.0,<5.0.0
-grpcio>=1.59.0
-packaging>=23.0
+grpcio>=1.60.0
+packaging>=23.2
 
 # Timezone
 pytz>=2023.3
-tzdata>=2023.3
+tzdata>=2023.4
+
+# ============================================================================
+# DEPENDÊNCIAS ADICIONAIS IDENTIFICADAS
+# ADDITIONAL IDENTIFIED DEPENDENCIES
+# ============================================================================
+# Para processamento de vídeo
+ffmpeg-python>=0.2.0
+imageio[ffmpeg]>=2.33.1
+
+# Para OCR avançado
+easyocr>=1.7.0
+
+# Para manipulação de arquivos
+# pathlib2>=2.3.7  # Não necessário no Python 3.4+
+
+# Para hash e criptografia
+# hashlib2>=1.0.1  # hashlib já está no Python padrão
+
+# Para parsing de URLs
+urllib3>=2.1.0
+
+# Para datetime avançado
+python-dateutil>=2.8.2
+
+# Para processamento JSON
+jsonschema>=4.20.0
+
+# Para regex avançado
+regex>=2023.12.25
 
 # ============================================================================
 # EXTRAS OPCIONAIS / OPTIONAL EXTRAS  
@@ -298,34 +322,37 @@ tzdata>=2023.3
 # Instale conforme necessário:
 # Install as needed:
 
-# GPU support (CUDA)
-# torch[cu118]>=2.0.0
-# torchvision[cu118]>=0.15.0
-# torchaudio[cu118]>=2.0.0
+# GPU support (CUDA) - Descomente para usar GPU
+# torch[cu121]>=2.1.0
+# torchvision[cu121]>=0.16.0
+# torchaudio[cu121]>=2.1.0
 
-# Modelos grandes
-# torch-audio>=2.0.0
-# torchaudio>=2.0.0
-# torchtext>=0.15.0
-
-# Processamento de vídeo avançado
-# ffmpeg-python>=0.2.0
-# imageio[ffmpeg]>=2.33.0
-
-# OCR avançado
-# easyocr>=1.7.0
+# Processamento de vídeo avançado - Descomente se necessário
 # paddlepaddle>=2.5.2
 # paddleocr>=2.7.0
 
 # ============================================================================
 # NOTAS DE INSTALAÇÃO / INSTALLATION NOTES
 # ============================================================================
-# 1. Para GPU: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# 1. Para GPU: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 # 2. Para Tesseract: instale o binário do sistema primeiro
-# 3. Para FFmpeg: instale o binário do sistema primeiro  
+#    - Ubuntu/Debian: sudo apt-get install tesseract-ocr tesseract-ocr-por
+#    - macOS: brew install tesseract tesseract-lang
+#    - Windows: Baixe do GitHub oficial do Tesseract
+# 3. Para FFmpeg: instale o binário do sistema primeiro
+#    - Ubuntu/Debian: sudo apt-get install ffmpeg
+#    - macOS: brew install ffmpeg
+#    - Windows: Baixe do site oficial do FFmpeg
 # 4. Para produção: considere usar imagens Docker otimizadas
 # 5. Para desenvolvimento: use ambiente virtual (venv/conda)
 
-# Installation commands:
+# Comandos de instalação:
 # pip install -r requirements.txt
 # pip install -e .  # Para instalação em modo desenvolvimento
+
+# Para verificar dependências:
+# pip check
+# pip list --outdated
+
+# Para atualizar dependências:
+# pip install --upgrade -r requirements.txt

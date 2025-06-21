@@ -2,9 +2,16 @@ from pathlib import Path
 import ocrmypdf
 from PIL import Image
 import pytesseract
-import fitz  # PyMuPDF
 import logging
 from ..config import DEFAULT_OCR_LANGUAGE, TESSERACT_CONFIG
+
+# Import condicional para PyMuPDF
+try:
+    import fitz  # PyMuPDF
+
+    PYMUPDF_AVAILABLE = True
+except ImportError:
+    PYMUPDF_AVAILABLE = False
 
 logger = logging.getLogger("omnisia.ocr")
 
@@ -64,6 +71,9 @@ def ocr_image(image_path: Path, language: str = None) -> str:
 def extract_text_from_pdf(pdf_path: Path) -> str:
     """Extrai texto de um PDF (sem OCR, apenas texto já presente)"""
     try:
+        if not PYMUPDF_AVAILABLE:
+            raise Exception("PyMuPDF não está instalado. Execute: pip install pymupdf")
+
         logger.info(f"Extraindo texto existente do PDF: {pdf_path}")
 
         text = ""

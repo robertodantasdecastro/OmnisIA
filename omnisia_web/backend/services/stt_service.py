@@ -251,4 +251,4 @@ def clear_model_cache():
     """Limpa cache de modelos carregados"""
     global _loaded_models
     logger.info("Limpando cache de modelos Whisper")
-    _loaded_models.clear()
+    _loaded_models = {}

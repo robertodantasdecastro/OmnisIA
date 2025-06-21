@@ -56,6 +56,7 @@ from config import (
     get_help_texts,
     is_development_mode,
     is_debug_enabled,
+    get_api_url,
 )
 
 from utils import (

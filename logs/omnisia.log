@@ -1,0 +1,22 @@
+2025-06-21 17:25:48,313 - omnisia - INFO - 🌟 OmnisIA API configurada - Versão 2.0.0
+2025-06-21 17:25:48,313 - omnisia - INFO - 🔗 Documentação: http://0.0.0.0:8000/docs
+2025-06-21 17:25:48,313 - omnisia - INFO - 🔍 ReDoc: http://0.0.0.0:8000/redoc
+2025-06-21 17:25:48,313 - omnisia - INFO - 🚀 Iniciando OmnisIA API
+2025-06-21 17:25:48,313 - omnisia - INFO - 📦 Versão: 2.0.0
+2025-06-21 17:25:48,313 - omnisia - INFO - 👨‍💻 Autor: Roberto Dantas de Castro
+2025-06-21 17:25:48,313 - omnisia - INFO - 🔧 Modo Debug: False
+2025-06-21 17:25:48,313 - omnisia - INFO - 🏗️ Modo Desenvolvimento: False
+2025-06-21 17:27:00,884 - omnisia - INFO - GET / - Status: 200 - Tempo: 0.014s - Cliente: 127.0.0.1
+2025-06-21 17:27:00,996 - omnisia - INFO - GET /favicon.ico - Status: 404 - Tempo: 0.000s - Cliente: 127.0.0.1
+2025-06-21 17:30:10,189 - omnisia - INFO - 🛑 Encerrando OmnisIA API
+2025-06-21 17:36:20,842 - omnisia - INFO - 🌟 OmnisIA API configurada - Versão 2.0.0
+2025-06-21 17:36:20,842 - omnisia - INFO - 🔗 Documentação: http://0.0.0.0:8000/docs
+2025-06-21 17:36:20,842 - omnisia - INFO - 🔍 ReDoc: http://0.0.0.0:8000/redoc
+2025-06-21 17:36:20,923 - omnisia - INFO - 🚀 Iniciando OmnisIA API
+2025-06-21 17:36:20,923 - omnisia - INFO - 📦 Versão: 2.0.0
+2025-06-21 17:36:20,924 - omnisia - INFO - 👨‍💻 Autor: Roberto Dantas de Castro
+2025-06-21 17:36:20,924 - omnisia - INFO - 🔧 Modo Debug: False
+2025-06-21 17:36:20,924 - omnisia - INFO - 🏗️ Modo Desenvolvimento: False
+2025-06-21 17:36:42,554 - omnisia - INFO - GET / - Status: 400 - Tempo: 0.001s - Cliente: 127.0.0.1
+2025-06-21 17:36:42,834 - omnisia - INFO - GET /favicon.ico - Status: 400 - Tempo: 0.001s - Cliente: 127.0.0.1
+2025-06-21 17:36:54,408 - omnisia - INFO - GET / - Status: 200 - Tempo: 0.012s - Cliente: 127.0.0.1
