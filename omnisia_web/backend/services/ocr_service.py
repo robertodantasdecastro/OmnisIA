@@ -1,10 +1,23 @@
 from pathlib import Path
-from ingestao.ocr import ocr_pdf as run_ocr_pdf, ocr_image as run_ocr_image
+import ocrmypdf
+from PIL import Image
+import pytesseract
 
 
 def ocr_pdf(pdf: Path, output: Path) -> Path:
-    return run_ocr_pdf(pdf, output)
+    """Extrai texto de um PDF usando OCR"""
+    try:
+        ocrmypdf.ocr(str(pdf), str(output), skip_text=True)
+        return output
+    except Exception as e:
+        raise Exception(f"Erro no OCR do PDF: {str(e)}")
 
 
 def ocr_image(image: Path) -> str:
-    return run_ocr_image(image)
+    """Extrai texto de uma imagem usando OCR"""
+    try:
+        img = Image.open(image)
+        text = pytesseract.image_to_string(img, lang="por+eng")
+        return text
+    except Exception as e:
+        raise Exception(f"Erro no OCR da imagem: {str(e)}")

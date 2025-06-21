@@ -1,7 +1,25 @@
 FROM python:3.10-slim
 
+# Instala dependências do sistema
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    tesseract-ocr \
+    tesseract-ocr-por \
+    tesseract-ocr-eng \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-COPY ../requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
-COPY .. /app/omnisia_web
-CMD ["uvicorn", "omnisia_web.backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# Copia requirements e instala dependências Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia o código do backend
+COPY backend/ ./backend/
+
+# Cria diretório para dados
+RUN mkdir -p data/uploads
+
+EXPOSE 8000
+
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

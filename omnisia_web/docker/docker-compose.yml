@@ -1,16 +1,29 @@
-version: '3'
+version: '3.8'
+
 services:
   backend:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.backend
     ports:
       - "8000:8000"
+    volumes:
+      - ../data:/app/data
+    environment:
+      - PYTHONPATH=/app
+    restart: unless-stopped
+
   frontend:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.frontend
     ports:
       - "8501:8501"
     depends_on:
       - backend
+    environment:
+      - API_URL=http://backend:8000
+    restart: unless-stopped
+
+volumes:
+  data:

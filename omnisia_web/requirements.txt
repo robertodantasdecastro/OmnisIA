@@ -10,3 +10,9 @@ sentence-transformers
 faiss-cpu
 peft
 datasets
+torch
+torchaudio
+pydantic
+python-multipart
+aiofiles
+pytesseract
