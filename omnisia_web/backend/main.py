@@ -17,6 +17,8 @@ from .config import (
     ENABLE_DEBUG,
     DEVELOPMENT_MODE,
     get_logs_path,
+    API_HOST,
+    API_PORT,
 )
 from .routers import upload, preprocess, train, chat
 
@@ -54,10 +56,15 @@ async def lifespan(app: FastAPI):
     logger.info(f"👨‍💻 Autor: {AUTHOR} ({EMAIL})")
     logger.info(f"🔧 Modo Debug: {ENABLE_DEBUG}")
     logger.info(f"🏗️ Modo Desenvolvimento: {DEVELOPMENT_MODE}")
+    
+    # Inicialização do timestamp de startup
+    app.state.start_time = time.time()
+    logger.info("✅ Backend inicializado com sucesso")
 
     yield
 
     logger.info("🛑 Encerrando OmnisIA Trainer Web Backend")
+    logger.info("✅ Backend encerrado com sucesso")
 
 
 # Inicialização do logging
@@ -193,15 +200,15 @@ async def get_info():
     }
 
 
-# Inicialização do timestamp de startup
-@app.on_event("startup")
-async def startup_event():
-    """Evento de inicialização"""
-    app.state.start_time = time.time()
-    logger.info("✅ Backend inicializado com sucesso")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Evento de encerramento"""
-    logger.info("✅ Backend encerrado com sucesso")
+# Execução do servidor
+if __name__ == "__main__":
+    import uvicorn
+    
+    logger.info(f"🚀 Iniciando servidor na porta {API_PORT}")
+    uvicorn.run(
+        "backend.main:app",
+        host=API_HOST,
+        port=API_PORT,
+        reload=DEVELOPMENT_MODE,
+        log_level=LOG_LEVEL.lower(),
+    )

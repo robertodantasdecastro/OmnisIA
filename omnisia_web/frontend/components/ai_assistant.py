@@ -12,8 +12,6 @@ from typing import Dict, List, Any, Optional
 import logging
 from datetime import datetime
 
-from ..utils.api_client import APIClient
-
 logger = logging.getLogger("omnisia.ai_assistant")
 
 
@@ -24,7 +22,6 @@ class AIAssistant:
     """
 
     def __init__(self):
-        self.api_client = APIClient()
         self.conversation_history = []
 
         # Contexto do assistente

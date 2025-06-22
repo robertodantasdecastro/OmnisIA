@@ -147,18 +147,24 @@ cache = SimpleCache()
 # UTILITÁRIOS DE SESSÃO
 # ============================================================================
 def init_session_state():
-    """Inicializa o estado da sessão"""
-    if SESSION_KEYS["chat_history"] not in st.session_state:
-        st.session_state[SESSION_KEYS["chat_history"]] = []
+    """Inicializa o estado da sessão e busca arquivos existentes."""
 
-    if SESSION_KEYS["uploaded_files"] not in st.session_state:
-        st.session_state[SESSION_KEYS["uploaded_files"]] = []
+    # Previne múltiplas execuções, verificando diretamente o st.session_state
+    if st.session_state.get("app_initialized", False):
+        return
 
-    if SESSION_KEYS["context_texts"] not in st.session_state:
-        st.session_state[SESSION_KEYS["context_texts"]] = []
+    # Inicializa as chaves da sessão
+    if "chat_history" not in st.session_state:
+        st.session_state["chat_history"] = []
 
-    if SESSION_KEYS["user_preferences"] not in st.session_state:
-        st.session_state[SESSION_KEYS["user_preferences"]] = {
+    if "uploaded_files" not in st.session_state:
+        st.session_state["uploaded_files"] = []
+
+    if "context_texts" not in st.session_state:
+        st.session_state["context_texts"] = []
+
+    if "user_preferences" not in st.session_state:
+        st.session_state["user_preferences"] = {
             "whisper_model": DEFAULT_WHISPER_MODEL,
             "ocr_language": DEFAULT_OCR_LANGUAGE,
             "embedding_model": EMBEDDING_MODEL,
@@ -166,23 +172,35 @@ def init_session_state():
             "theme": "light",
         }
 
-    if SESSION_KEYS["last_api_check"] not in st.session_state:
-        st.session_state[SESSION_KEYS["last_api_check"]] = None
+    # Busca arquivos existentes na API
+    try:
+        if check_api_health():
+            success, files, error = make_api_request("upload/files")
+            if success and isinstance(files, list):
+                st.session_state["uploaded_files"] = files
+            else:
+                logger.error(
+                    f"Erro ao buscar arquivos iniciais: {error or 'Resposta inválida'}"
+                )
+                st.session_state["uploaded_files"] = []
+    except Exception as e:
+        logger.error(f"Falha crítica ao buscar arquivos da API: {e}")
+        st.session_state["uploaded_files"] = []
 
-    if SESSION_KEYS["cached_models"] not in st.session_state:
-        st.session_state[SESSION_KEYS["cached_models"]] = []
-
-    if SESSION_KEYS["cached_files"] not in st.session_state:
-        st.session_state[SESSION_KEYS["cached_files"]] = []
+    # Marca a sessão como inicializada
+    st.session_state["app_initialized"] = True
 
 
 def get_chat_history() -> List[Dict[str, Any]]:
     """Obtém o histórico de chat"""
-    return st.session_state.get(SESSION_KEYS["chat_history"], [])
+    return st.session_state.get("chat_history", [])
 
 
 def add_chat_message(
-    role: str, content: str, confidence: float = 1.0, sources: List[str] = None
+    role: str,
+    content: str,
+    confidence: float = 1.0,
+    sources: Optional[List[str]] = None,
 ):
     """Adiciona mensagem ao histórico de chat"""
     history = get_chat_history()
@@ -200,29 +218,29 @@ def add_chat_message(
     }
 
     history.append(message)
-    st.session_state[SESSION_KEYS["chat_history"]] = history
+    st.session_state["chat_history"] = history
 
 
 def clear_chat_history():
     """Limpa o histórico de chat"""
-    st.session_state[SESSION_KEYS["chat_history"]] = []
+    st.session_state["chat_history"] = []
 
 
 def get_uploaded_files() -> List[Dict[str, Any]]:
     """Obtém lista de arquivos enviados"""
-    return st.session_state.get(SESSION_KEYS["uploaded_files"], [])
+    return st.session_state.get("uploaded_files", [])
 
 
 def add_uploaded_file(file_info: Dict[str, Any]):
     """Adiciona arquivo à lista de uploads"""
     files = get_uploaded_files()
     files.append(file_info)
-    st.session_state[SESSION_KEYS["uploaded_files"]] = files
+    st.session_state["uploaded_files"] = files
 
 
 def get_context_texts() -> List[str]:
     """Obtém textos de contexto"""
-    return st.session_state.get(SESSION_KEYS["context_texts"], [])
+    return st.session_state.get("context_texts", [])
 
 
 def add_context_text(text: str):
@@ -230,24 +248,24 @@ def add_context_text(text: str):
     texts = get_context_texts()
     if text.strip() and text not in texts:
         texts.append(text.strip())
-        st.session_state[SESSION_KEYS["context_texts"]] = texts
+        st.session_state["context_texts"] = texts
 
 
 def clear_context_texts():
     """Limpa textos de contexto"""
-    st.session_state[SESSION_KEYS["context_texts"]] = []
+    st.session_state["context_texts"] = []
 
 
 def get_user_preferences() -> Dict[str, Any]:
     """Obtém preferências do usuário"""
-    return st.session_state.get(SESSION_KEYS["user_preferences"], {})
+    return st.session_state.get("user_preferences", {})
 
 
 def update_user_preferences(preferences: Dict[str, Any]):
     """Atualiza preferências do usuário"""
     current = get_user_preferences()
     current.update(preferences)
-    st.session_state[SESSION_KEYS["user_preferences"]] = current
+    st.session_state["user_preferences"] = current
 
 
 # ============================================================================
@@ -256,9 +274,9 @@ def update_user_preferences(preferences: Dict[str, Any]):
 def make_api_request(
     endpoint: str,
     method: str = "GET",
-    data: Dict[str, Any] = None,
-    files: Dict[str, Any] = None,
-    timeout: int = None,
+    data: Optional[Dict[str, Any]] = None,
+    files: Optional[Dict[str, Any]] = None,
+    timeout: Optional[int] = None,
 ) -> Tuple[bool, Dict[str, Any], str]:
     """
     Faz requisição para a API
@@ -325,25 +343,20 @@ def check_api_health() -> bool:
 
 
 def get_api_status() -> Dict[str, Any]:
-    """Obtém status detalhado da API"""
-    success, data, error = make_api_request("status")
+    """Obtém o status da API (online/offline)."""
+    success, data, error = make_api_request("health")
 
-    if success:
+    if success and data.get("status") == "healthy":
         return {
             "online": True,
             "version": data.get("version", "unknown"),
-            "uptime": data.get("uptime", 0),
-            "models_loaded": data.get("models_loaded", 0),
-            "files_processed": data.get("files_processed", 0),
+            "error": None,
         }
     else:
         return {
             "online": False,
-            "error": error,
+            "error": error or "A API não respondeu como esperado.",
             "version": "unknown",
-            "uptime": 0,
-            "models_loaded": 0,
-            "files_processed": 0,
         }
 
 
@@ -399,11 +412,12 @@ def format_file_size(size_bytes: int) -> str:
 
     size_names = ["B", "KB", "MB", "GB"]
     i = 0
-    while size_bytes >= 1024 and i < len(size_names) - 1:
-        size_bytes /= 1024.0
+    float_size = float(size_bytes)
+    while float_size >= 1024 and i < len(size_names) - 1:
+        float_size /= 1024.0
         i += 1
 
-    return f"{size_bytes:.1f}{size_names[i]}"
+    return f"{float_size:.1f}{size_names[i]}"
 
 
 def format_duration(seconds: int) -> str:
@@ -596,7 +610,7 @@ def debug_info():
         st.json(list(st.session_state.keys()))
 
 
-def log_function_call(func_name: str, args: Dict[str, Any] = None):
+def log_function_call(func_name: str, args: Optional[Dict[str, Any]] = None):
     """Log de chamada de função"""
     if is_debug_enabled():
         logger.debug(f"Function call: {func_name}, Args: {args}")
@@ -666,7 +680,7 @@ class APIHelper:
     def add_context(texts: List[str]) -> Optional[Dict]:
         """Adiciona contexto"""
         success, data, _ = make_api_request(
-            "chat/add-context", method="POST", data=texts
+            "chat/add-context", method="POST", data={"texts": texts}
         )
         return data if success else None
 

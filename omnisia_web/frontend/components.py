@@ -213,11 +213,11 @@ def create_sidebar():
 
     # Status da API
     st.sidebar.markdown("### 🌐 Status da API")
-    api_online = check_api_health()
-    if api_online:
-        st.sidebar.success(get_messages()["api_online"])
+    status = get_api_status()
+    if status["online"]:
+        st.sidebar.success(MESSAGES.get("api_online", "API Backend: Online"))
     else:
-        st.sidebar.error(get_messages()["api_offline_status"])
+        st.sidebar.error(MESSAGES.get("api_offline_status", "API Backend: Offline"))
 
     # Links úteis
     st.sidebar.markdown("### 🔗 Links Úteis")
@@ -250,99 +250,43 @@ def create_dashboard():
     """Cria página do dashboard"""
     create_header("🏠 Dashboard", "Visão geral do sistema")
 
-    # Métricas principais
-    col1, col2, col3, col4 = st.columns(4)
+    # Obter e exibir status do sistema
+    status = get_api_status()
+    if status["online"]:
+        st.success(f"✅ Sistema Online (Versão API: {status.get('version', 'N/A')})")
+    else:
+        st.error(
+            f"❌ Sistema Offline\n\nErro: {status.get('error', 'Causa desconhecida')}"
+        )
 
+    st.markdown("---")
+
+    # Exibição das métricas
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("📁 Arquivos", len(get_uploaded_files()))
+        st.metric("Arquivos", len(get_uploaded_files()))
+    with col2:
+        st.metric("Mensagens", "0")
+    with col3:
+        st.metric("Contextos", "0")
+    with col4:
+        st.metric("Modelos", "0")
+
+    st.markdown("---")
+
+    # Seções de informações
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader(" Arquivos Recentes")
+        files = get_uploaded_files()
+        if files:
+            df = create_files_dataframe(files[:5])  # Exibe os 5 mais recentes
+            st.dataframe(df, use_container_width=True)
+        else:
+            st.info("Nenhum arquivo encontrado")
 
     with col2:
-        st.metric("💬 Mensagens", len(get_chat_history()))
-
-    with col3:
-        st.metric("📝 Contextos", len(get_context_texts()))
-
-    with col4:
-        api_status = get_api_status()
-        st.metric("🤖 Modelos", api_status.get("models_loaded", 0))
-
-    # Status da API
-    st.markdown("### 🌐 Status do Sistema")
-    api_status = get_api_status()
-
-    if api_status["online"]:
-        st.markdown(
-            """
-        <div class="success-card">
-            <h4>✅ Sistema Online</h4>
-            <p><strong>Versão:</strong> {}</p>
-            <p><strong>Uptime:</strong> {}</p>
-            <p><strong>Modelos Carregados:</strong> {}</p>
-            <p><strong>Arquivos Processados:</strong> {}</p>
-        </div>
-        """.format(
-                api_status["version"],
-                format_duration(api_status["uptime"]),
-                api_status["models_loaded"],
-                api_status["files_processed"],
-            ),
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown(
-            """
-        <div class="error-card">
-            <h4>❌ Sistema Offline</h4>
-            <p><strong>Erro:</strong> {}</p>
-        </div>
-        """.format(
-                api_status.get("error", "Desconhecido")
-            ),
-            unsafe_allow_html=True,
-        )
-
-    # Arquivos recentes
-    st.markdown("### 📁 Arquivos Recentes")
-    files = get_uploaded_files()
-    if files:
-        recent_files = files[-RECENT_FILES_LIMIT:]
-        df = create_files_dataframe(recent_files)
-        st.dataframe(df, use_container_width=True)
-    else:
-        st.info(get_messages()["no_files_found"])
-
-    # Histórico de chat recente
-    st.markdown("### 💬 Conversa Recente")
-    chat_history = get_chat_history()
-    if chat_history:
-        recent_messages = chat_history[-5:]  # Últimas 5 mensagens
-        for message in recent_messages:
-            role = message["role"]
-            content = message["content"]
-            timestamp = format_timestamp(message["timestamp"])
-
-            if role == "user":
-                st.markdown(
-                    f"""
-                <div class="chat-message user-message">
-                    <strong>Você:</strong> {content}<br>
-                    <small>{timestamp}</small>
-                </div>
-                """,
-                    unsafe_allow_html=True,
-                )
-            else:
-                confidence = message.get("confidence", 1.0)
-                st.markdown(
-                    f"""
-                <div class="chat-message bot-message">
-                    <strong>Assistente:</strong> {content}<br>
-                    <small>{timestamp} - {format_confidence(confidence)}</small>
-                </div>
-                """,
-                    unsafe_allow_html=True,
-                )
-    else:
+        st.subheader(" Conversa Recente")
         st.info("Nenhuma conversa ainda")
 
 
@@ -362,32 +306,35 @@ def create_upload_page():
         help=get_help_texts()["file_upload"],
     )
 
-    if uploaded_file:
-        # Validação
-        is_valid, error_msg = validate_file_upload(uploaded_file)
+    if uploaded_file is not None:
+        is_valid, message = validate_file_upload(uploaded_file)
 
         if is_valid:
-            st.success(f"✅ Arquivo válido: {uploaded_file.name}")
-            st.write(f"**Tamanho:** {format_file_size(uploaded_file.size)}")
-            st.write(f"**Tipo:** {uploaded_file.type}")
-
-            # Botão de upload
-            if st.button("🚀 Enviar Arquivo"):
-                with st.spinner("Enviando arquivo..."):
-                    success, data, error = make_api_request(
-                        "upload/",
-                        method="POST",
-                        files={"file": (uploaded_file.name, uploaded_file.getvalue())},
+            st.success(f"Arquivo válido: {uploaded_file.name}")
+            if st.button("🚀 Enviar para Processamento"):
+                with st.spinner("Enviando arquivo para o backend..."):
+                    files = {
+                        "file": (
+                            uploaded_file.name,
+                            uploaded_file.getvalue(),
+                            uploaded_file.type,
+                        )
+                    }
+                    success, result, error = make_api_request(
+                        "upload/", method="POST", files=files
                     )
 
                     if success:
-                        show_success_message(get_messages()["upload_success"])
-                        add_uploaded_file(data)
-                        st.json(data)
+                        # Adiciona o arquivo à sessão com os dados retornados pela API
+                        add_uploaded_file(result)
+                        show_success_message(
+                            f"Arquivo '{result.get('name')}' enviado com sucesso!"
+                        )
+                        st.json(result)
                     else:
-                        show_error_message(f"Erro no upload: {error}")
+                        show_error_message(f"Falha no envio: {error}")
         else:
-            show_error_message(error_msg)
+            show_error_message(message)
 
     # Lista de arquivos enviados
     st.markdown("### 📋 Arquivos Enviados")
@@ -412,19 +359,31 @@ def create_preprocessing_page():
     create_header("🔧 Pré-processamento", "Processe arquivos para extrair texto")
 
     # Seleção de arquivo
-    files = get_uploaded_files()
-    if not files:
+    all_files = get_uploaded_files()
+    if not all_files:
         st.warning("Nenhum arquivo disponível. Faça upload primeiro.")
         return
 
-    selected_file = st.selectbox(
+    # Filtra por arquivos que são dicionários e têm a chave 'name' para evitar erros
+    valid_files = [f for f in all_files if isinstance(f, dict) and f.get("name")]
+
+    if not valid_files:
+        st.warning(
+            "Nenhum arquivo válido encontrado para processamento. Por favor, tente fazer o upload novamente."
+        )
+        return
+
+    # Mapeia nomes de arquivos para suas informações para seleção
+    file_options = {f["name"]: f for f in valid_files}
+    selected_file_name = st.selectbox(
         "Selecione um arquivo para processar:",
-        [f["name"] for f in files],
-        format_func=lambda x: f"{get_file_type_icon(x)} {x}",
+        options=list(file_options.keys()),
+        format_func=lambda name: f"{get_file_type_icon(name)} {name}",
     )
 
-    if selected_file:
-        file_info = next((f for f in files if f["name"] == selected_file), None)
+    if selected_file_name:
+        # Obtém o dicionário completo do arquivo selecionado
+        file_info = file_options.get(selected_file_name)
 
         if file_info:
             st.markdown("### 📄 Informações do Arquivo")

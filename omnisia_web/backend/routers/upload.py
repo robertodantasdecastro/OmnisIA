@@ -2,8 +2,9 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 from pathlib import Path
 import shutil
 import os
-from typing import List
+from typing import List, Dict
 from ..config import UPLOAD_DIR, ALLOWED_EXTENSIONS, MAX_FILE_SIZE
+from datetime import datetime
 
 router = APIRouter()
 
@@ -25,7 +26,7 @@ def validate_file(file: UploadFile) -> None:
 
 @router.post("/")
 async def upload_file(file: UploadFile = File(...)):
-    """Upload de arquivo com validação"""
+    """Upload de arquivo com validação e retorno de metadados completos."""
     try:
         validate_file(file)
 
@@ -39,10 +40,17 @@ async def upload_file(file: UploadFile = File(...)):
 
         # Salva o arquivo
         dest = UPLOAD_DIR / file.filename
-        with dest.open("wb") as f:
-            f.write(file_content)
+        dest.write_bytes(file_content)
 
-        return {"filename": file.filename, "size": len(file_content), "path": str(dest)}
+        # Retorna o mesmo formato do endpoint de listagem
+        return {
+            "name": file.filename,
+            "size": len(file_content),
+            "path": str(dest.resolve()),
+            "type": dest.suffix.lower().replace(".", ""),
+            "status": "Recebido",
+            "upload_date": datetime.now().isoformat(),
+        }
 
     except HTTPException:
         raise
@@ -50,22 +58,37 @@ async def upload_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Erro no upload: {str(e)}")
 
 
-@router.get("/files")
-async def list_files():
-    """Lista arquivos enviados"""
+@router.get("/files", response_model=List[Dict])
+async def list_uploaded_files():
+    """
+    Lista todos os arquivos no diretório de upload, fornecendo
+    um dicionário completo de informações para cada arquivo.
+    """
     try:
-        files = []
-        for file_path in UPLOAD_DIR.iterdir():
-            if file_path.is_file():
-                files.append(
-                    {
-                        "filename": file_path.name,
-                        "size": file_path.stat().st_size,
-                        "modified": file_path.stat().st_mtime,
-                    }
-                )
-        return {"files": files}
+        files_info = []
+        if not UPLOAD_DIR.exists():
+            return []
+
+        for item in UPLOAD_DIR.iterdir():
+            if item.is_file():
+                file_info = {
+                    "name": item.name,
+                    "size": item.stat().st_size,
+                    "path": str(item.resolve()),
+                    "type": item.suffix.lower().replace(".", ""),
+                    "status": "Disponível",
+                    "upload_date": datetime.fromtimestamp(
+                        item.stat().st_ctime
+                    ).isoformat(),
+                }
+                files_info.append(file_info)
+
+        # Ordena os arquivos por data de modificação, os mais recentes primeiro
+        files_info.sort(key=lambda x: x["upload_date"], reverse=True)
+        return files_info
+
     except Exception as e:
+        # Log do erro pode ser adicionado aqui
         raise HTTPException(
             status_code=500, detail=f"Erro ao listar arquivos: {str(e)}"
         )
